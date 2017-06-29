@@ -1,0 +1,18 @@
+library(dplyr)
+library(ggplot2)
+data <- read.csv("~/format-uniq.csv")
+head(data)
+pdf("format.pdf",width=12, height=22)
+qplot(site, format, data=data) + theme(axis.text.x = element_text(angle = -90, hjust = 1))
+dev.off()
+data <- read.csv("~/format-sort.csv")
+head(data)
+counts <- data %>% group_by(site, format) %>% summarise(count=n())
+counts
+write.csv(counts, "formats-by-site.csv")
+# load into sql and merge with cannonical list
+data <- read.csv("~/date-formats/preferred-formats.csv")
+str(data)
+fails <- data %>% group_by(site, preferred) %>% summarize(count = sum(count))
+qplot(site, count, data=fails, color=preferred)+ theme(axis.text.x = element_text(angle = 90, hjust = 1))  + geom_point(size=3) + ggtitle("Preferred vs non preferred date format strings")
+fails %>% group_by(preferred) %>% summarize(count=sum(count))
